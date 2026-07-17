@@ -8,6 +8,7 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 from telegram.request import HTTPXRequest
 
+TELEGRAM_API_BASE_URL = os.getenv("TELEGRAM_API_BASE_URL", "https://api.telegram.org")
 # ---------- КОНФИГУРАЦИЯ ----------
 proxy_url = os.getenv("HTTP_PROXY") or os.getenv("HTTPS_PROXY")
 if proxy_url:
@@ -257,9 +258,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     if http_request:
-        application = Application.builder().token(BOT_TOKEN).request(http_request).build()
+        application = Application.builder().token(BOT_TOKEN).request(http_request).base_url(TELEGRAM_API_BASE_URL).build()
     else:
-        application = Application.builder().token(BOT_TOKEN).build()
+        application = Application.builder().token(BOT_TOKEN).base_url(TELEGRAM_API_BASE_URL).build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("subscribe", subscribe))
@@ -275,4 +276,5 @@ def main():
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
+    
     main()
