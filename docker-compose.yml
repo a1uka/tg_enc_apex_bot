@@ -1,8 +1,7 @@
 version: '3.8'
-
 services:
   algs-bot:
-    build: .
+    image: ghcr.io/a1uka/tg_enc_apex_bot:latest
     container_name: algs-telegram-bot
     restart: unless-stopped
     volumes:
