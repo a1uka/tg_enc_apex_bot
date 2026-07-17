@@ -261,7 +261,7 @@ def main():
         application = Application.builder().token(BOT_TOKEN).request(http_request).base_url(TELEGRAM_API_BASE_URL).build()
     else:
         application = Application.builder().token(BOT_TOKEN).base_url(TELEGRAM_API_BASE_URL).build()
-
+    print(TELEGRAM_API_BASE_URL) 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("subscribe", subscribe))
     application.add_handler(CommandHandler("unsubscribe", unsubscribe))
