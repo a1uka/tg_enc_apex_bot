@@ -8,22 +8,6 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
 from telegram.request import HTTPXRequest
 
-TELEGRAM_API_BASE_URL = os.getenv("TELEGRAM_API_BASE_URL", "https://api.telegram.org")
-# ---------- КОНФИГУРАЦИЯ ----------
-proxy_url = os.getenv("HTTP_PROXY") or os.getenv("HTTPS_PROXY")
-if proxy_url:
-    http_request = HTTPXRequest(
-        proxy=proxy_url,
-        connection_pool_size=8,
-        connect_timeout=60.0,
-        read_timeout=60.0,
-        write_timeout=60.0,
-    )
-else:
-    http_request = None
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-if not BOT_TOKEN:
-    raise ValueError("BOT_TOKEN не задан в переменных окружения")
 
 BASE_URL = "https://majestic.battlefy.com/algs/algs-season-6/lineups/event/6a46b91bb8a9a90012342648/region/europe-middle-east-and-africa"
 LIMIT = 20
@@ -257,11 +241,14 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start(update, context)
 
 def main():
-    if http_request:
-        application = Application.builder().token(BOT_TOKEN).request(http_request).base_url(TELEGRAM_API_BASE_URL).build()
-    else:
-        application = Application.builder().token(BOT_TOKEN).base_url(TELEGRAM_API_BASE_URL).build()
-    print(TELEGRAM_API_BASE_URL) 
+    BOT_TOKEN = os.getenv("BOT_TOKEN")
+    TELEGRAM_API_BASE_URL = os.getenv("TELEGRAM_API_BASE_URL", "https://api.telegram.org")
+    
+    # Собираем полный URL с токеном
+    base_url_with_token = f"{TELEGRAM_API_BASE_URL}{BOT_TOKEN}"
+    
+    application = Application.builder().base_url(base_url_with_token).build()
+    
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("subscribe", subscribe))
     application.add_handler(CommandHandler("unsubscribe", unsubscribe))
