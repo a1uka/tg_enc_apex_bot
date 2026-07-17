@@ -6,8 +6,20 @@ from datetime import datetime
 import requests
 from telegram import Update
 from telegram.ext import Application, CommandHandler, ContextTypes
+from telegram.request import HTTPXRequest
 
 # ---------- КОНФИГУРАЦИЯ ----------
+proxy_url = os.getenv("HTTP_PROXY") or os.getenv("HTTPS_PROXY")
+if proxy_url:
+    http_request = HTTPXRequest(
+        proxy=proxy_url,
+        connection_pool_size=8,
+        connect_timeout=60.0,
+        read_timeout=60.0,
+        write_timeout=60.0,
+    )
+else:
+    http_request = None
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 if not BOT_TOKEN:
     raise ValueError("BOT_TOKEN не задан в переменных окружения")
@@ -244,7 +256,10 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await start(update, context)
 
 def main():
-    application = Application.builder().token(BOT_TOKEN).build()
+    if http_request:
+        application = Application.builder().token(BOT_TOKEN).request(http_request).build()
+    else:
+        application = Application.builder().token(BOT_TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("subscribe", subscribe))
