@@ -8,3 +8,11 @@ services:
       - ./data:/app/data
     environment:
       - BOT_TOKEN=${BOT_TOKEN}
+      - HTTP_PROXY=socks5://zapret-docker-proxy:1080
+      - HTTPS_PROXY=socks5://zapret-docker-proxy:1080
+    networks:
+      - proxy-network
+
+networks:
+  proxy-network:
+    external: true
